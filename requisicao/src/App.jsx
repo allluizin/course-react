@@ -99,7 +99,7 @@ function App() {
             peso:
             <input type="text" value={peso} name='peso' onChange={(e) => setPeso(e.target.value)} />
           </label>
-          <input type="submit" value="criar" />
+          <input type="submit" value="enviar dados" />
       </form>
     </div>
    </div>
