@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
-
+import { useFetch } from './hooks/useFetch'
 
 const url = "http://localhost:8080/estoque/info"
 const url1 = "http://localhost:8080/estoque"
@@ -10,26 +10,30 @@ function App() {
 
   const [estoque, setEstoque] = useState([])
 
+  //custom hook
+  const {data : items} = useFetch(url);
+  
+
   const [tamanho, setTamanho] = useState("")
   const [densidade, setDensidade] = useState("")
   const [quantidadeMilheiro, setQuantidadeMilheiro] = useState("")
   const [peso, setPeso] = useState("")
 
   //1- resgatando dados
-  useEffect(() => {
+  // useEffect(() => {
 
-    async function fetchData(){
+  //   async function fetchData(){
       
-      const res = await fetch(url)
+  //     const res = await fetch(url)
 
-      const data = await res.json()
+  //     const data = await res.json()
   
-      setEstoque(data)
-    }
+  //     setEstoque(data)
+  //   }
 
-    fetchData()
+  //   fetchData()
     
-  }, [])
+  // }, [])
 
   //limpeza de inputs
   const clearInputs = () => {
@@ -72,7 +76,7 @@ function App() {
    <div className="App">
     <h1>Lista de produtos</h1>
     <ul>
-      {estoque.map((estoque) => (
+      {items && items.map((estoque) => (
         <li key={estoque.id}>
           {estoque.tamanho} - 
           {estoque.densidadeEnum} - 
