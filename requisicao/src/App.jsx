@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { useFetch } from './hooks/useFetch'
 
-const url = "http://localhost:8080/estoque/info"
-const url1 = "http://localhost:8080/estoque"
+const url = "http://localhost:8080/estoque"
 
 function App() {
   const inputRef = useRef(null)
@@ -11,7 +10,7 @@ function App() {
   const [estoque, setEstoque] = useState([])
 
   //custom hook
-  const {data : items} = useFetch(url);
+  const {data : items, httpConfig, loading, error} = useFetch(url);
   
 
   const [tamanho, setTamanho] = useState("")
@@ -54,37 +53,47 @@ function App() {
       pesoMilheiro: peso,
     }
 
-    const res = await fetch(url1, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(estoque)
-    })
+    // const res = await fetch(url, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify(estoque)
+    // })
 
-    //carregamento dinamico
-    const addedEstoque = await res.json()
-    setEstoque((prevEstoque) => [...prevEstoque, addedEstoque])
+    // //carregamento dinamico
+    // const addedEstoque = await res.json()
+    // setEstoque((prevEstoque) => [...prevEstoque, addedEstoque])
+
+    //refatorando o post
+    httpConfig(estoque, "POST")
 
     //limpar os inputs
-    clearInputs()
+    
 
     inputRef.current.focus()
+  }
+  //desafio 6
+  const handleRemove = (id) => {
+    httpConfig(id, "DELETE")
   }
 
   return (
    <div className="App">
     <h1>Lista de produtos</h1>
-    <ul>
+    {loading && <p>Carregando dados...</p>}
+    {error && <p>{error}</p>}
+    {!error && <ul>
       {items && items.map((estoque) => (
         <li key={estoque.id}>
           {estoque.tamanho} - 
           {estoque.densidadeEnum} - 
           {estoque.quantidadeMilheiro} - 
           {estoque.pesoMilheiro}
+          <button onClick={() => handleRemove(estoque.id)}>Excluir</button>
           </li>
       ))}
-    </ul>
+    </ul>}
     <div className="add-product">
       <form onSubmit={handleSubmit}>
           <label>
@@ -103,7 +112,8 @@ function App() {
             peso:
             <input type="text" value={peso} name='peso' onChange={(e) => setPeso(e.target.value)} />
           </label>
-          <input type="submit" value="enviar dados" />
+          {loading && <input type="submit" disabled value="aguarde.." />}
+          {!loading && <input type="submit" value="enviar dados" />}
       </form>
     </div>
    </div>
